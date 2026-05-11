@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hovercheck — Tools for Pilots</title>
+  <meta name="description" content="Hovercheck builds practical tools for general aviation pilots. Starting with interactive POH checklists — offline-capable, cockpit-readable, free to use." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:          #0D0B09;
+      --surface:     #181513;
+      --surface2:    #201D19;
+      --border:      #2C2820;
+      --accent:      #C8924A;
+      --accent-dim:  #B57E38;
+      --green:       #4CAF7A;
+      --text:        #EDE8DF;
+      --text-muted:  #998D80;
+      --text-dim:    #5E5850;
+      --radius:      14px;
+      --radius-sm:   8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @media (prefers-reduced-motion: no-preference) {
+      html:focus-within { scroll-behavior: smooth; }
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, .nav-logo { font-family: 'Space Grotesk', -apple-system, sans-serif; }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13, 11, 9, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 58px;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+    .nav-logo svg { flex-shrink: 0; color: var(--accent); }
+    .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-right a { color: var(--text-muted); font-size: 0.875rem; }
+    .nav-right a:hover { color: var(--text); text-decoration: none; }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent);
+      color: #0D0B09 !important;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+    }
+    .nav-cta:hover { background: var(--accent-dim); text-decoration: none !important; }
+
+    /* ─── HERO ─── */
+    .hero {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 7rem 2rem 5rem;
+      text-align: center;
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0.85;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 3.75rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 520px;
+      margin: 0 auto 3rem;
+      line-height: 1.65;
+    }
+
+    /* ─── DIVIDER ─── */
+    .divider { border: none; border-top: 1px solid var(--border); }
+
+    /* ─── PRODUCT SECTION ─── */
+    .product-section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+    }
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0.85;
+      margin-bottom: 0.75rem;
+    }
+    .product-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .product-info {
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1.25rem;
+    }
+    .product-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 99px;
+      background: rgba(76, 175, 122, 0.1);
+      color: var(--green);
+      border: 1px solid rgba(76, 175, 122, 0.2);
+      width: fit-content;
+    }
+    .product-tag::before { content: "●"; font-size: 0.5rem; }
+    .product-info h2 {
+      font-size: clamp(1.6rem, 3vw, 2rem);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+    }
+    .product-info p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      max-width: 380px;
+    }
+    .product-features {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .product-feature {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    .product-feature svg { flex-shrink: 0; color: var(--accent); opacity: 0.8; }
+    .product-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--accent);
+      color: #0D0B09;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: var(--radius-sm);
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-primary:hover { background: var(--accent-dim); text-decoration: none; transform: translateY(-1px); }
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      transition: background 0.15s, color 0.15s, transform 0.1s;
+    }
+    .btn-outline:hover { background: var(--surface2); color: var(--text); text-decoration: none; transform: translateY(-1px); }
+
+    /* ─── PRODUCT MOCKUP PANEL ─── */
+    .product-preview {
+      background: var(--bg);
+      border-left: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mockup-wrap { width: 100%; max-width: 240px; }
+    .mockup-phone {
+      background: #080706;
+      border: 2px solid var(--border);
+      border-radius: 24px;
+      padding: 10px 9px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px #1a1713;
+    }
+    .mockup-screen {
+      background: var(--surface);
+      border-radius: 15px;
+      overflow: hidden;
+      font-size: 0.65rem;
+    }
+    .mockup-header {
+      background: var(--surface);
+      padding: 7px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .mockup-title { font-weight: 700; font-size: 0.68rem; font-family: 'Space Grotesk', sans-serif; }
+    .mockup-phase {
+      padding: 6px 9px;
+      background: rgba(200, 146, 74, 0.08);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .mockup-phase-name { font-weight: 600; color: var(--accent); font-size: 0.62rem; }
+    .mockup-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 9px;
+      border-bottom: 1px solid rgba(44, 40, 32, 0.7);
+    }
+    .mockup-item.done { opacity: 0.38; }
+    .mockup-check {
+      width: 12px; height: 12px;
+      border-radius: 2px;
+      border: 1.5px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mockup-check.checked { background: var(--green); border-color: var(--green); }
+    .mockup-item-label { font-size: 0.6rem; color: var(--text-muted); flex: 1; }
+    .mockup-item-val { font-size: 0.6rem; color: var(--text-dim); font-weight: 600; }
+    .mockup-item-val.active { color: var(--accent); }
+    .mockup-emergency {
+      background: rgba(224, 85, 69, 0.1);
+      border-top: 1px solid rgba(224, 85, 69, 0.22);
+      padding: 6px 9px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: #E05545;
+    }
+
+    /* ─── ABOUT ─── */
+    .about-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .about-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 4.5rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .about-label { font-family: 'Space Grotesk', sans-serif; }
+    .about-label h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      color: var(--text);
+    }
+    .about-label h2 span { color: var(--accent); }
+    .about-body { display: flex; flex-direction: column; gap: 1rem; }
+    .about-body p {
+      font-size: 0.975rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+    .about-body p strong { color: var(--text); font-weight: 600; }
+
+    /* ─── CONTACT ─── */
+    .contact-section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .contact-text h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin-bottom: 0.3rem;
+    }
+    .contact-text p { font-size: 0.9rem; color: var(--text-muted); }
+    .contact-email {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.6rem 1.25rem;
+      border-radius: var(--radius-sm);
+      transition: background 0.15s;
+    }
+    .contact-email:hover { background: var(--surface2); text-decoration: none; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.75rem 2rem;
+    }
+    .footer-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.875rem;
+      color: var(--text-dim);
+      text-decoration: none;
+    }
+    .footer-logo svg { color: var(--accent); opacity: 0.6; }
+    .footer-right { font-size: 0.8rem; color: var(--text-dim); }
+    .footer-right a { color: var(--text-dim); }
+    .footer-right a:hover { color: var(--text-muted); text-decoration: none; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 720px) {
+      nav { padding: 0 1rem; }
+      .hero { padding: 5rem 1.25rem 3.5rem; }
+      .product-section { padding: 3.5rem 1.25rem; }
+      .product-card { grid-template-columns: 1fr; }
+      .product-preview { display: none; }
+      .product-info { padding: 2rem 1.5rem; }
+      .about-inner { grid-template-columns: 1fr; gap: 1.5rem; padding: 3rem 1.25rem; }
+      .contact-section { padding: 3rem 1.25rem; flex-direction: column; align-items: flex-start; }
+      footer { padding: 1.5rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="/">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/>
+      <path d="M12 8v4l3 3"/>
+    </svg>
+    Hovercheck
+  </a>
+  <div class="nav-right">
+    <a href="mailto:admin@hovercheck.co">Contact</a>
+    <a class="nav-cta" href="https://checklists.hovercheck.co/app">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Launch Checklists
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <span class="eyebrow">Tools for pilots</span>
+  <h1>Practical tools for<br /><em>general aviation.</em></h1>
+  <p class="hero-sub">Hovercheck builds simple, focused tools for pilots — starting with interactive POH checklists that work offline, look good in the cockpit, and get out of your way.</p>
+</section>
+
+<hr class="divider" />
+
+<!-- PRODUCT -->
+<div class="product-section">
+  <p class="section-label">Products</p>
+
+  <div class="product-card">
+    <div class="product-info">
+      <span class="product-tag">Live</span>
+      <h2>Hovercheck<br />Checklists</h2>
+      <p>Interactive pilot operating checklists for general aviation — offline-capable, touch-friendly, and built for use in the cockpit. Free for personal use, no account required.</p>
+      <div class="product-features">
+        <div class="product-feature">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Tap-to-complete checklists with phase tracking
+        </div>
+        <div class="product-feature">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Emergency procedures always one tap away
+        </div>
+        <div class="product-feature">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.29"/></svg>
+          Fully offline — works at remote strips with no signal
+        </div>
+        <div class="product-feature">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+          R22, R44, Cabri G2 — more aircraft added regularly
+        </div>
+      </div>
+      <div class="product-actions">
+        <a class="btn-primary" href="https://checklists.hovercheck.co/app">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Launch App
+        </a>
+        <a class="btn-outline" href="https://checklists.hovercheck.co">
+          Learn more
+        </a>
+      </div>
+    </div>
+
+    <div class="product-preview" aria-hidden="true">
+      <div class="mockup-wrap">
+        <div class="mockup-phone">
+          <div class="mockup-screen">
+            <div class="mockup-header">
+              <span class="mockup-title">Robinson R22</span>
+              <span style="font-size:0.55rem;color:#4CAF7A;font-weight:700;">● OFFLINE</span>
+            </div>
+            <div class="mockup-phase">
+              <span class="mockup-phase-name">Before Takeoff</span>
+              <span style="font-size:0.55rem;color:#998D80;">3 / 7</span>
+            </div>
+            <div class="mockup-item done">
+              <div class="mockup-check checked">
+                <svg width="7" height="7" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg>
+              </div>
+              <span class="mockup-item-label">Fuel — sufficient</span>
+              <span class="mockup-item-val">CHECK</span>
+            </div>
+            <div class="mockup-item done">
+              <div class="mockup-check checked">
+                <svg width="7" height="7" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg>
+              </div>
+              <span class="mockup-item-label">Clutch light</span>
+              <span class="mockup-item-val">OUT</span>
+            </div>
+            <div class="mockup-item done">
+              <div class="mockup-check checked">
+                <svg width="7" height="7" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,6 5,9 10,3"/></svg>
+              </div>
+              <span class="mockup-item-label">Carburetor heat</span>
+              <span class="mockup-item-val">COLD</span>
+            </div>
+            <div class="mockup-item" style="background:rgba(200,146,74,0.07);">
+              <div class="mockup-check"></div>
+              <span class="mockup-item-label" style="color:#EDE8DF;font-weight:600;">RPM</span>
+              <span class="mockup-item-val active">CHECK</span>
+            </div>
+            <div class="mockup-item">
+              <div class="mockup-check"></div>
+              <span class="mockup-item-label">Altimeter</span>
+              <span class="mockup-item-val">SET</span>
+            </div>
+            <div class="mockup-item">
+              <div class="mockup-check"></div>
+              <span class="mockup-item-label">Transponder</span>
+              <span class="mockup-item-val">ALT</span>
+            </div>
+            <div class="mockup-emergency">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Emergency Procedures
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider" />
+
+<!-- ABOUT -->
+<div class="about-section">
+  <div class="about-inner">
+    <div class="about-label">
+      <h2>Built by a<br />pilot, for<br /><span>pilots.</span></h2>
+    </div>
+    <div class="about-body">
+      <p>Hovercheck exists because most existing tools for pilots are either locked behind subscriptions, poorly designed for cockpit use, or simply not built with real flying in mind. We think that's backwards.</p>
+      <p><strong>Every tool we build</strong> is free for personal use, works offline, and is designed to be usable in direct sunlight on a kneeboard. No accounts, no trackers, no friction.</p>
+      <p>We're starting with checklists — parsed directly from the POH and kept up to date by the community. If you fly a type that isn't in the library yet, <a href="mailto:admin@hovercheck.co?subject=Manual+submission">get in touch</a> and we'll add it.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div>
+  <div class="contact-section">
+    <div class="contact-text">
+      <h3>Get in touch</h3>
+      <p>Questions, submissions, commercial enquiries, or just want to say hello.</p>
+    </div>
+    <a class="contact-email" href="mailto:admin@hovercheck.co">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      admin@hovercheck.co
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <a class="footer-logo" href="/">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/>
+        <path d="M12 8v4l3 3"/>
+      </svg>
+      Hovercheck
+    </a>
+    <div class="footer-right">
+      &copy; 2025 Hovercheck &mdash; <a href="mailto:admin@hovercheck.co">admin@hovercheck.co</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
