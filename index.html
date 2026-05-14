@@ -392,6 +392,150 @@
     .footer-right a { color: var(--text-dim); }
     .footer-right a:hover { color: var(--text-muted); text-decoration: none; }
 
+    /* ─── DYSLEXIC MODE ─── */
+    body.dyslexic {
+      --bg:         #FFFBF0;
+      --surface:    #F5EDD8;
+      --surface2:   #EDE1C8;
+      --border:     #D4C0A0;
+      --accent:     #B5680A;
+      --accent-dim: #9A5608;
+      --green:      #2E7D52;
+      --text:       #2D2015;
+      --text-muted: #5C4A3A;
+      --text-dim:   #8C7060;
+      letter-spacing: 0.03em;
+      line-height: 1.85;
+      word-spacing: 0.08em;
+    }
+    body.dyslexic nav {
+      background: rgba(255, 251, 240, 0.95);
+    }
+
+    /* ─── RULER GUIDE ─── */
+    #ruler-guide {
+      position: fixed;
+      left: 0; right: 0;
+      height: 44px;
+      pointer-events: none;
+      z-index: 9998;
+      background: rgba(200, 146, 74, 0.09);
+      border-top: 1px solid rgba(200, 146, 74, 0.22);
+      border-bottom: 1px solid rgba(200, 146, 74, 0.22);
+      display: none;
+      top: 0;
+      transform: translateY(-50%);
+    }
+    body.ruler-on #ruler-guide { display: block; }
+
+    /* ─── ACCESSIBILITY PANEL ─── */
+    .a11y-wrap { position: relative; }
+    .a11y-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: inherit;
+      transition: background 0.15s, color 0.15s;
+    }
+    .a11y-btn:hover { background: var(--surface2); color: var(--text); }
+    .a11y-panel {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      min-width: 230px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+      display: none;
+      z-index: 200;
+    }
+    .a11y-panel.open { display: block; }
+    .a11y-panel-title {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+    .a11y-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.55rem 0;
+      border-top: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .a11y-toggle:first-of-type { border-top: none; padding-top: 0; }
+    .a11y-toggle-label { flex: 1; }
+    .a11y-toggle-label strong { display: block; font-size: 0.875rem; color: var(--text); font-weight: 600; }
+    .a11y-toggle-label span { font-size: 0.775rem; color: var(--text-muted); }
+    .a11y-switch {
+      width: 36px; height: 20px;
+      background: var(--border);
+      border-radius: 99px;
+      position: relative;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .a11y-switch::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      background: var(--text-dim);
+      border-radius: 50%;
+      top: 3px; left: 3px;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .a11y-toggle.active .a11y-switch { background: var(--accent); }
+    .a11y-toggle.active .a11y-switch::after { transform: translateX(16px); background: #fff; }
+
+    /* ─── USE CASES ─── */
+    .usecases-section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+    }
+    .usecases-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+    .usecase-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+    }
+    .usecase-card .uc-eyebrow {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0.85;
+      margin-bottom: 0.6rem;
+    }
+    .usecase-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin-bottom: 0.6rem;
+    }
+    .usecase-card p { font-size: 0.875rem; color: var(--text-muted); line-height: 1.65; }
+
     /* ─── RESPONSIVE ─── */
     @media (max-width: 720px) {
       nav { padding: 0 1rem; }
@@ -402,11 +546,14 @@
       .product-info { padding: 2rem 1.5rem; }
       .about-inner { grid-template-columns: 1fr; gap: 1.5rem; padding: 3rem 1.25rem; }
       .contact-section { padding: 3rem 1.25rem; flex-direction: column; align-items: flex-start; }
+      .usecases-grid { grid-template-columns: 1fr; }
       footer { padding: 1.5rem 1.25rem; }
     }
   </style>
 </head>
 <body>
+
+<div id="ruler-guide" aria-hidden="true"></div>
 
 <!-- NAV -->
 <nav>
@@ -419,6 +566,26 @@
   </a>
   <div class="nav-right">
     <a href="mailto:admin@hovercheck.co">Contact</a>
+    <div class="a11y-wrap">
+      <button class="a11y-btn" id="a11y-btn" aria-label="Accessibility options" title="Accessibility options">Aa</button>
+      <div class="a11y-panel" id="a11y-panel" role="dialog" aria-label="Accessibility settings">
+        <div class="a11y-panel-title">Accessibility</div>
+        <div class="a11y-toggle" id="toggle-dyslexic" role="switch" aria-checked="false" tabindex="0">
+          <div class="a11y-toggle-label">
+            <strong>Dyslexic-friendly colours</strong>
+            <span>Warm cream background, increased spacing</span>
+          </div>
+          <div class="a11y-switch"></div>
+        </div>
+        <div class="a11y-toggle" id="toggle-ruler" role="switch" aria-checked="false" tabindex="0">
+          <div class="a11y-toggle-label">
+            <strong>Reading ruler</strong>
+            <span>Highlight band follows your cursor</span>
+          </div>
+          <div class="a11y-switch"></div>
+        </div>
+      </div>
+    </div>
     <a class="nav-cta" href="https://checklists.hovercheck.co/app">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       Launch Checklists
@@ -534,6 +701,38 @@
 
 <hr class="divider" />
 
+<!-- USE CASES -->
+<div class="usecases-section">
+  <p class="section-label">Who it's for</p>
+  <h2 style="font-family:'Space Grotesk',sans-serif;font-size:clamp(1.5rem,3vw,2rem);font-weight:700;letter-spacing:-0.02em;margin-bottom:0.5rem;">Made for these moments</h2>
+  <p style="font-size:0.975rem;color:var(--text-muted);max-width:500px;">Whether you're stepping into a new cockpit for the first time or dusting off your licence — Hovercheck has you covered.</p>
+
+  <div class="usecases-grid">
+    <div class="usecase-card">
+      <div class="uc-eyebrow">New type rating</div>
+      <h3>First time on a new type?</h3>
+      <p>Loading a new aircraft into Hovercheck before your first lesson lets you familiarise yourself with the sequence before you even touch the controls. Follow along step-by-step until the flows become second nature — and reference the exact POH wording from day one.</p>
+    </div>
+    <div class="usecase-card">
+      <div class="uc-eyebrow">Currency refresher</div>
+      <h3>Returning after time away?</h3>
+      <p>Haven't flown in a few months? Working through the full checklist before your return flight helps rebuild muscle memory and confidence — ensuring nothing gets missed when it matters most. Take it at your own pace, on the ground, before you're in the seat.</p>
+    </div>
+    <div class="usecase-card">
+      <div class="uc-eyebrow">Student pilots</div>
+      <h3>Learning to fly?</h3>
+      <p>Hovercheck gives students a clean, readable view of the full checklist — exactly as it appears in the POH — so you can study procedures between lessons. Arrive at each session already familiar with the sequence, and use it alongside your instructor until the flow is locked in.</p>
+    </div>
+    <div class="usecase-card">
+      <div class="uc-eyebrow">Daily flying</div>
+      <h3>Flying regularly?</h3>
+      <p>Even experienced pilots benefit from a consistent, methodical checklist. Hovercheck keeps everything in one place — offline, always available, and quick to reset between flights. No paper to lose, no app to subscribe to. Just the checklist, every time.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider" />
+
 <!-- ABOUT -->
 <div class="about-section">
   <div class="about-inner">
@@ -578,5 +777,58 @@
   </div>
 </footer>
 
+<script>
+  (function () {
+    var body = document.body;
+    var panel = document.getElementById('a11y-panel');
+    var btn = document.getElementById('a11y-btn');
+    var ruler = document.getElementById('ruler-guide');
+    var tdToggle = document.getElementById('toggle-dyslexic');
+    var trToggle = document.getElementById('toggle-ruler');
+
+    function applyPref(key, cls, el) {
+      if (localStorage.getItem(key) === '1') {
+        body.classList.add(cls);
+        el.classList.add('active');
+        el.setAttribute('aria-checked', 'true');
+      }
+    }
+    applyPref('hc-dyslexic', 'dyslexic', tdToggle);
+    applyPref('hc-ruler', 'ruler-on', trToggle);
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = panel.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', function () {
+      panel.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+    panel.addEventListener('click', function (e) { e.stopPropagation(); });
+
+    function makeToggle(el, cls, storageKey) {
+      function toggle() {
+        el.classList.toggle('active');
+        var on = el.classList.contains('active');
+        body.classList.toggle(cls, on);
+        el.setAttribute('aria-checked', on);
+        localStorage.setItem(storageKey, on ? '1' : '0');
+      }
+      el.addEventListener('click', toggle);
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    }
+    makeToggle(tdToggle, 'dyslexic', 'hc-dyslexic');
+    makeToggle(trToggle, 'ruler-on', 'hc-ruler');
+
+    document.addEventListener('mousemove', function (e) {
+      if (body.classList.contains('ruler-on')) {
+        ruler.style.top = e.clientY + 'px';
+      }
+    });
+  })();
+</script>
 </body>
 </html>
