@@ -7,7 +7,7 @@
   <meta name="description" content="Hovercheck builds practical tools for general aviation pilots. Starting with interactive POH checklists — offline-capable, cockpit-readable, free to use." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg:          #0D0B09;
@@ -404,9 +404,16 @@
       --text:       #2D2015;
       --text-muted: #5C4A3A;
       --text-dim:   #8C7060;
+      font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
       letter-spacing: 0.03em;
       line-height: 1.85;
       word-spacing: 0.08em;
+    }
+    body.dyslexic h1,
+    body.dyslexic h2,
+    body.dyslexic h3 {
+      font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+      letter-spacing: -0.01em;
     }
     body.dyslexic nav {
       background: rgba(255, 251, 240, 0.95);
